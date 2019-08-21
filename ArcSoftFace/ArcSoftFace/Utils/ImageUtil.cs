@@ -38,7 +38,6 @@ namespace ArcSoftFace.Utils
             Image<Bgr, byte> my_Image = null;
             try
             {
-                //图像灰度转化
                 my_Image = new Image<Bgr, byte>(new Bitmap(image));
                 imageInfo.format = ASF_ImagePixelFormat.ASVL_PAF_RGB24_B8G8R8;
                 imageInfo.width = my_Image.Width;
