@@ -19,6 +19,11 @@ namespace ArcSoftFace.Utils
             ASF_MultiFaceInfo multiFaceInfo = new ASF_MultiFaceInfo();
             IntPtr pMultiFaceInfo = MemoryUtil.Malloc(MemoryUtil.SizeOf<ASF_MultiFaceInfo>());
             int retCode = ASFFunctions.ASFDetectFaces(pEngine, imageInfo.width, imageInfo.height, imageInfo.format, imageInfo.imgData, pMultiFaceInfo);
+            if (retCode != 0)
+            {
+                MemoryUtil.Free(pMultiFaceInfo);
+                return multiFaceInfo;
+            }
             multiFaceInfo = MemoryUtil.PtrToStructure<ASF_MultiFaceInfo>(pMultiFaceInfo);
             MemoryUtil.Free(pMultiFaceInfo);
             return multiFaceInfo;
