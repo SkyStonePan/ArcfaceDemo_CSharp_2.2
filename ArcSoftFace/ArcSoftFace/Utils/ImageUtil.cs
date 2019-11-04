@@ -36,9 +36,15 @@ namespace ArcSoftFace.Utils
         {
             ImageInfo imageInfo = new ImageInfo();
             Image<Bgr, byte> my_Image = null;
+            Bitmap bitmap = null;
             try
             {
-                my_Image = new Image<Bgr, byte>(new Bitmap(image));
+                bitmap = new Bitmap(image);
+                if(bitmap == null)
+                {
+                    return null;
+                }
+                my_Image = new Image<Bgr, byte>(bitmap);
                 imageInfo.format = ASF_ImagePixelFormat.ASVL_PAF_RGB24_B8G8R8;
                 imageInfo.width = my_Image.Width;
                 imageInfo.height = my_Image.Height;
@@ -58,10 +64,14 @@ namespace ArcSoftFace.Utils
                 {
                     my_Image.Dispose();
                 }
+                if(bitmap != null)
+                {
+                    bitmap.Dispose();
+                }
             }
             return null;
         }
-
+        
         /// <summary>
         /// 获取图片IR信息
         /// </summary>
