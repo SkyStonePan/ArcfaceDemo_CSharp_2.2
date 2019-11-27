@@ -43,14 +43,6 @@ namespace ArcSoftFace.Utils
                 ASF_MultiFaceInfo multiFaceInfo = new ASF_MultiFaceInfo();
                 if (image != null)
                 {
-                    if (image.Width > 1536 || image.Height > 1536)
-                    {
-                        image = ImageUtil.ScaleImage(image, 1536, 1536);
-                    }
-                    else
-                    {
-                        image = ImageUtil.ScaleImage(image, image.Width, image.Height);
-                    }
                     if(image == null)
                     {
                         return multiFaceInfo;
