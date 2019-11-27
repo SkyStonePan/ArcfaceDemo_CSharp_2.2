@@ -1096,25 +1096,32 @@ namespace ArcSoftFace
         /// </summary>
         private void Form_Closed(object sender, FormClosedEventArgs e)
         {
-            if (rgbVideoSource.IsRunning)
+            try
             {
-                btnStartVideo_Click(sender, e); //关闭摄像头
-            }
-            
-            //销毁引擎
-            int retCode = ASFFunctions.ASFUninitEngine(pImageEngine);
-            Console.WriteLine("UninitEngine pImageEngine Result:" + retCode);
-            //销毁引擎
-            retCode = ASFFunctions.ASFUninitEngine(pVideoEngine);
-            Console.WriteLine("UninitEngine pVideoEngine Result:" + retCode);
-            
-            //销毁引擎
-            retCode = ASFFunctions.ASFUninitEngine(pVideoRGBImageEngine);
-            Console.WriteLine("UninitEngine pVideoImageEngine Result:" + retCode);
+                if (rgbVideoSource.IsRunning)
+                {
+                    btnStartVideo_Click(sender, e); //关闭摄像头
+                }
 
-            //销毁引擎
-            retCode = ASFFunctions.ASFUninitEngine(pVideoIRImageEngine);
-            Console.WriteLine("UninitEngine pVideoIRImageEngine Result:" + retCode);
+                //销毁引擎
+                int retCode = ASFFunctions.ASFUninitEngine(pImageEngine);
+                Console.WriteLine("UninitEngine pImageEngine Result:" + retCode);
+                //销毁引擎
+                retCode = ASFFunctions.ASFUninitEngine(pVideoEngine);
+                Console.WriteLine("UninitEngine pVideoEngine Result:" + retCode);
+
+                //销毁引擎
+                retCode = ASFFunctions.ASFUninitEngine(pVideoRGBImageEngine);
+                Console.WriteLine("UninitEngine pVideoImageEngine Result:" + retCode);
+
+                //销毁引擎
+                retCode = ASFFunctions.ASFUninitEngine(pVideoIRImageEngine);
+                Console.WriteLine("UninitEngine pVideoIRImageEngine Result:" + retCode);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("UninitEngine pImageEngine Error:" + ex.Message);
+            }
         }
         #endregion
 
