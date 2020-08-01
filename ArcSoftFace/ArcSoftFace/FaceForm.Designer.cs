@@ -104,9 +104,9 @@
             // 
             // imageLists
             // 
-            this.imageLists.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageLists.ImageStream")));
+            this.imageLists.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+            this.imageLists.ImageSize = new System.Drawing.Size(80, 80);
             this.imageLists.TransparentColor = System.Drawing.Color.Transparent;
-            this.imageLists.Images.SetKeyName(0, "alai_152784032385984494.jpg");
             // 
             // imageList
             // 
