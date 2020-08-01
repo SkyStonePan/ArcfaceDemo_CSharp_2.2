@@ -1,7 +1,5 @@
 ﻿using ArcSoftFace.Entity;
 using ArcSoftFace.SDKModels;
-using Emgu.CV;
-using Emgu.CV.Structure;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -35,41 +33,40 @@ namespace ArcSoftFace.Utils
         public static ImageInfo ReadBMP(Image image)
         {
             ImageInfo imageInfo = new ImageInfo();
-            Image<Bgr, byte> my_Image = null;
-            Bitmap bitmap = null;
+
+            //将Image转换为Format24bppRgb格式的BMP
+            Bitmap bm = new Bitmap(image);
+            BitmapData data = bm.LockBits(new Rectangle(0, 0, bm.Width, bm.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
             try
             {
-                bitmap = new Bitmap(image);
-                if(bitmap == null)
-                {
-                    return null;
-                }
-                my_Image = new Image<Bgr, byte>(bitmap);
-                imageInfo.format = ASF_ImagePixelFormat.ASVL_PAF_RGB24_B8G8R8;
-                imageInfo.width = my_Image.Width;
-                imageInfo.height = my_Image.Height;
+                //位图中第一个像素数据的地址。它也可以看成是位图中的第一个扫描行
+                IntPtr ptr = data.Scan0;
 
-                imageInfo.imgData = MemoryUtil.Malloc(my_Image.Bytes.Length);
-                MemoryUtil.Copy(my_Image.Bytes, 0, imageInfo.imgData, my_Image.Bytes.Length);
+                //定义数组长度
+                int soureBitArrayLength = data.Height * Math.Abs(data.Stride);
+                byte[] sourceBitArray = new byte[soureBitArrayLength];
+
+                //将bitmap中的内容拷贝到ptr_bgr数组中
+                MemoryUtil.Copy(ptr, sourceBitArray, 0, soureBitArrayLength);
+
+                //填充引用对象字段值
+                imageInfo.width = data.Width;
+                imageInfo.height = data.Height;
+                imageInfo.format = (int)ASF_ImagePixelFormat.ASVL_PAF_RGB24_B8G8R8;
+
+                imageInfo.imgData = MemoryUtil.Malloc(sourceBitArray.Length);
+                MemoryUtil.Copy(sourceBitArray, 0, imageInfo.imgData, sourceBitArray.Length);
 
                 return imageInfo;
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Console.WriteLine(ex.Message);
+                throw e;
             }
             finally
             {
-                if (my_Image != null)
-                {
-                    my_Image.Dispose();
-                }
-                if(bitmap != null)
-                {
-                    bitmap.Dispose();
-                }
+                bm.UnlockBits(data);
             }
-            return null;
         }
         
         /// <summary>
@@ -77,41 +74,56 @@ namespace ArcSoftFace.Utils
         /// </summary>
         /// <param name="image">图片</param>
         /// <returns>成功或失败</returns>
-        public static ImageInfo ReadBMP_IR(Bitmap bitmap)
+        public static ImageInfo ReadBMP_IR(Bitmap image)
         {
             ImageInfo imageInfo = new ImageInfo();
-            Image<Bgr, byte> my_Image = null;
-            Image<Gray, byte> gray_image = null;
+
+            BitmapData data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
             try
             {
-                //图像灰度转化
-                my_Image = new Image<Bgr, byte>(bitmap);
-                gray_image = my_Image.Convert<Gray, byte>(); //灰度化函数
-                imageInfo.format = ASF_ImagePixelFormat.ASVL_PAF_GRAY;
-                imageInfo.width = gray_image.Width;
-                imageInfo.height = gray_image.Height;
-                imageInfo.imgData = MemoryUtil.Malloc(gray_image.Bytes.Length);
-                MemoryUtil.Copy(gray_image.Bytes, 0, imageInfo.imgData, gray_image.Bytes.Length);
+                //位图中第一个像素数据的地址。它也可以看成是位图中的第一个扫描行
+                IntPtr ptr = data.Scan0;
+
+                //定义数组长度
+                int soureBitArrayLength = data.Height * Math.Abs(data.Stride);
+                byte[] sourceBitArray = new byte[soureBitArrayLength];
+
+                //将bitmap中的内容拷贝到ptr_bgr数组中
+                MemoryUtil.Copy(ptr, sourceBitArray, 0, soureBitArrayLength);
+
+                //填充引用对象字段值
+                imageInfo.width = data.Width;
+                imageInfo.height = data.Height;
+                imageInfo.format = (int)ASF_ImagePixelFormat.ASVL_PAF_GRAY;
+
+                //获取去除对齐位后度图像数据
+                int line = imageInfo.width;
+                int pitch = Math.Abs(data.Stride);
+                int ir_len = line * imageInfo.height;
+                byte[] destBitArray = new byte[ir_len];
+
+                //灰度化
+                int j = 0;
+                double colortemp = 0;
+                for (int i = 0; i < sourceBitArray.Length; i += 3)
+                {
+                    colortemp = sourceBitArray[i + 2] * 0.299 + sourceBitArray[i + 1] * 0.587 + sourceBitArray[i] * 0.114;
+                    destBitArray[j++] = (byte)colortemp;
+                }
+
+                imageInfo.imgData = MemoryUtil.Malloc(destBitArray.Length);
+                MemoryUtil.Copy(destBitArray, 0, imageInfo.imgData, destBitArray.Length);
 
                 return imageInfo;
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Console.WriteLine(ex.Message);
+                throw e;
             }
             finally
             {
-                if (my_Image != null)
-                {
-                    my_Image.Dispose();
-                }
-                if (gray_image != null)
-                {
-                    gray_image.Dispose();
-                }
+                image.UnlockBits(data);
             }
-
-            return null;
         }
 
         /// <summary>
