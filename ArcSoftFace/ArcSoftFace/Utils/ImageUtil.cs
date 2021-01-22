@@ -66,6 +66,7 @@ namespace ArcSoftFace.Utils
             finally
             {
                 bm.UnlockBits(data);
+                bm.Dispose();
             }
         }
         
